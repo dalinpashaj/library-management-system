@@ -13,6 +13,8 @@ interface QueryResult {
 
 const EXAMPLE_QUESTIONS = [
   "Who owns the most books?",
+  "Which is the most popular book?",
+  "Show the 5 most expensive books",
   "How many books are there?",
   "Show genre breakdown",
   "Show books by genre Fantasy",

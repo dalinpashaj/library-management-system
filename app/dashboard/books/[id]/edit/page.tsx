@@ -25,6 +25,8 @@ export default async function EditBookPage({ params }: { params: { id: string } 
           title: book.title,
           author: book.author,
           genre: book.genre,
+          price: book.price,
+          rating: book.rating,
           readingStatus: book.readingStatus,
         }}
       />

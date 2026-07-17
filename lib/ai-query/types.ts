@@ -1,6 +1,8 @@
 export type QueryIntent =
   | "most_books_owner"
   | "most_popular_book"
+  | "most_expensive_books"
+  | "most_highly_rated_books"
   | "books_by_genre"
   | "books_by_status"
   | "books_by_author"

@@ -3,6 +3,7 @@ import type { ParsedQuery, QueryIntent } from "./types";
 const VALID_INTENTS: QueryIntent[] = [
   "most_books_owner",
   "most_popular_book",
+  "most_expensive_books",
   "books_by_genre",
   "books_by_status",
   "books_by_author",
@@ -24,6 +25,7 @@ Given a natural language question, respond with a JSON object matching this sche
 Valid intents and their params:
 - most_books_owner: no params
 - most_popular_book: no params
+- most_expensive_books: { "n": <number> }
 - books_by_genre: { "genre": "<genre name>" }
 - books_by_status: { "status": "reading" | "completed" | "want_to_read" }
 - books_by_author: { "author": "<author name>" }

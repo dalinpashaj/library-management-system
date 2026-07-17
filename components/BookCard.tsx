@@ -9,6 +9,8 @@ interface Book {
   title: string;
   author: string;
   genre: string;
+  price: number;
+  rating: number | null;
   readingStatus: "reading" | "completed" | "want_to_read";
   owner?: { name: string };
 }
@@ -50,6 +52,13 @@ export function BookCard({ book, showOwner = false }: { book: Book; showOwner?: 
 
       <div className="flex items-center gap-2 text-xs text-gray-500">
         <span className="badge bg-gray-100 text-gray-700">{book.genre}</span>
+        <span className="text-gray-500">${book.price.toFixed(2)}</span>
+        {book.rating != null && (
+          <span className="text-yellow-500" aria-label={`Rated ${book.rating} out of 5`}>
+            {"★".repeat(book.rating)}
+            {"☆".repeat(5 - book.rating)}
+          </span>
+        )}
         {showOwner && book.owner && (
           <span className="text-gray-400">· {book.owner.name}</span>
         )}

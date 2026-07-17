@@ -10,6 +10,8 @@ interface BookFormProps {
     title: string;
     author: string;
     genre: string;
+    price: number;
+    rating: number | null;
     readingStatus: ReadingStatus;
   };
 }
@@ -36,6 +38,8 @@ export function BookForm({ bookId, initial }: BookFormProps) {
     genre: initial?.genre ?? "",
     readingStatus: initial?.readingStatus ?? ReadingStatus.want_to_read,
   });
+  const [price, setPrice] = useState(initial?.price != null ? String(initial.price) : "");
+  const [rating, setRating] = useState<number | null>(initial?.rating ?? null);
   const [customGenre, setCustomGenre] = useState(
     initial?.genre && !COMMON_GENRES.includes(initial.genre) ? initial.genre : ""
   );
@@ -56,9 +60,15 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       return;
     }
 
+    const parsedPrice = price.trim() === "" ? 0 : Number(price);
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      setError("Price must be a positive number.");
+      return;
+    }
+
     setLoading(true);
 
-    const payload = { ...form, genre: effectiveGenre.trim() };
+    const payload = { ...form, genre: effectiveGenre.trim(), price: parsedPrice, rating };
     const url = isEdit ? `/api/books/${bookId}` : "/api/books";
     const method = isEdit ? "PUT" : "POST";
 
@@ -155,6 +165,46 @@ export function BookForm({ bookId, initial }: BookFormProps) {
             </button>
           </div>
         )}
+      </div>
+
+      <div>
+        <label className="label" htmlFor="price">Price ($)</label>
+        <input
+          id="price"
+          type="number"
+          className="input"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          min={0}
+          step="0.01"
+          placeholder="0.00"
+        />
+      </div>
+
+      <div>
+        <label className="label">Your Rating</label>
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+              className="text-2xl leading-none text-yellow-500"
+              onClick={() => setRating(rating === star ? null : star)}
+            >
+              {rating != null && star <= rating ? "★" : "☆"}
+            </button>
+          ))}
+          {rating != null && (
+            <button
+              type="button"
+              className="ml-2 text-xs text-gray-500 hover:text-gray-700"
+              onClick={() => setRating(null)}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div>

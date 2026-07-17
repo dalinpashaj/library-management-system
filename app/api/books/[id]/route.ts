@@ -8,6 +8,8 @@ const updateSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   author: z.string().min(1).max(255).optional(),
   genre: z.string().min(1).max(100).optional(),
+  price: z.number().min(0).optional(),
+  rating: z.number().int().min(1).max(5).nullable().optional(),
   readingStatus: z.nativeEnum(ReadingStatus).optional(),
 });
 

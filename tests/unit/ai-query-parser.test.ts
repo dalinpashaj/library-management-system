@@ -17,8 +17,57 @@ describe("parseQuery — rule-based intent parser", () => {
     it.each([
       "What is the most popular book?",
       "which book is the most common",
+      "Which is the most popular book?",
     ])('matches "%s"', (q) => {
       expect(parseQuery(q)?.intent).toBe("most_popular_book");
+    });
+  });
+
+  describe("most_expensive_books", () => {
+    it("extracts n from 'show the 5 most expensive books'", () => {
+      const result = parseQuery("Show the 5 most expensive books");
+      expect(result?.intent).toBe("most_expensive_books");
+      expect(result?.params.n).toBe(5);
+    });
+
+    it("defaults n to 1 for singular 'most expensive book'", () => {
+      const result = parseQuery("What is the most expensive book?");
+      expect(result?.intent).toBe("most_expensive_books");
+      expect(result?.params.n).toBe(1);
+    });
+
+    it("defaults n to 5 for plural with no number", () => {
+      const result = parseQuery("Show me the most expensive books");
+      expect(result?.intent).toBe("most_expensive_books");
+      expect(result?.params.n).toBe(5);
+    });
+
+    it.each(["priciest books", "highest-priced books"])('matches "%s"', (q) => {
+      expect(parseQuery(q)?.intent).toBe("most_expensive_books");
+    });
+  });
+
+  describe("most_highly_rated_books", () => {
+    it("extracts n from 'show the 5 highest rated books'", () => {
+      const result = parseQuery("Show the 5 highest rated books");
+      expect(result?.intent).toBe("most_highly_rated_books");
+      expect(result?.params.n).toBe(5);
+    });
+
+    it("defaults n to 1 for singular 'highest rated book'", () => {
+      const result = parseQuery("What is the highest rated book?");
+      expect(result?.intent).toBe("most_highly_rated_books");
+      expect(result?.params.n).toBe(1);
+    });
+
+    it("defaults n to 5 for plural with no number", () => {
+      const result = parseQuery("Show me the top rated books");
+      expect(result?.intent).toBe("most_highly_rated_books");
+      expect(result?.params.n).toBe(5);
+    });
+
+    it.each(["my best books", "best rated books", "5 star books"])('matches "%s"', (q) => {
+      expect(parseQuery(q)?.intent).toBe("most_highly_rated_books");
     });
   });
 

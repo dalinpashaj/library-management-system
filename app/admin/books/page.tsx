@@ -81,6 +81,8 @@ export default async function AdminBooksPage({ searchParams }: { searchParams: S
               <th className="px-4 py-3 text-left font-medium text-gray-700">Author</th>
               <th className="px-4 py-3 text-left font-medium text-gray-700">Genre</th>
               <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">Price</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">Rating</th>
               <th className="px-4 py-3 text-left font-medium text-gray-700">Owner</th>
               <th className="px-4 py-3 text-right font-medium text-gray-700">Actions</th>
             </tr>

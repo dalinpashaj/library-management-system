@@ -9,6 +9,8 @@ interface Book {
   title: string;
   author: string;
   genre: string;
+  price: number;
+  rating: number | null;
   readingStatus: "reading" | "completed" | "want_to_read";
   owner: { name: string; email: string };
 }
@@ -47,6 +49,17 @@ export function AdminBookRow({ book }: { book: Book }) {
         <span className={`badge ${STATUS_STYLES[book.readingStatus]}`}>
           {STATUS_LABELS[book.readingStatus]}
         </span>
+      </td>
+      <td className="px-4 py-3 text-gray-700">${book.price.toFixed(2)}</td>
+      <td className="px-4 py-3 text-yellow-500">
+        {book.rating != null ? (
+          <span aria-label={`Rated ${book.rating} out of 5`}>
+            {"★".repeat(book.rating)}
+            {"☆".repeat(5 - book.rating)}
+          </span>
+        ) : (
+          <span className="text-gray-300">—</span>
+        )}
       </td>
       <td className="px-4 py-3 text-gray-600 text-xs">
         {book.owner.name}<br />

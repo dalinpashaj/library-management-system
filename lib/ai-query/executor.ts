@@ -34,6 +34,37 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       };
     }
 
+    case "most_expensive_books": {
+      const n = Number(params.n ?? 5);
+      const books = await prisma.book.findMany({
+        include: { owner: { select: { name: true } } },
+        orderBy: { price: "desc" },
+        take: n,
+      });
+      if (books.length === 0) return { data: [], summary: "No books found." };
+      const summary =
+        n === 1
+          ? `The most expensive book is "${books[0].title}" by ${books[0].author} at $${books[0].price.toFixed(2)}.`
+          : `Here are the ${books.length} most expensive book(s), sorted by price (highest first).`;
+      return { data: books, summary };
+    }
+
+    case "most_highly_rated_books": {
+      const n = Number(params.n ?? 5);
+      const books = await prisma.book.findMany({
+        where: { rating: { not: null } },
+        include: { owner: { select: { name: true } } },
+        orderBy: { rating: "desc" },
+        take: n,
+      });
+      if (books.length === 0) return { data: [], summary: "No rated books found." };
+      const summary =
+        n === 1
+          ? `The highest rated book is "${books[0].title}" by ${books[0].author} at ${books[0].rating}/5.`
+          : `Here are the ${books.length} highest rated book(s), sorted by rating (highest first).`;
+      return { data: books, summary };
+    }
+
     case "user_count": {
       const count = await prisma.user.count();
       return { data: { count }, summary: `There are ${count} registered user(s) in the system.` };

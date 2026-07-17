@@ -8,6 +8,8 @@ const bookSchema = z.object({
   title: z.string().min(1).max(255),
   author: z.string().min(1).max(255),
   genre: z.string().min(1).max(100),
+  price: z.number().min(0).optional().default(0),
+  rating: z.number().int().min(1).max(5).nullable().optional(),
   readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
 });
 
