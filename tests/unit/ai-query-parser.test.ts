@@ -71,6 +71,47 @@ describe("parseQuery — rule-based intent parser", () => {
     });
   });
 
+  describe("longest_books", () => {
+    it("extracts n from 'show the 3 longest books'", () => {
+      const result = parseQuery("Show the 3 longest books");
+      expect(result?.intent).toBe("longest_books");
+      expect(result?.params.n).toBe(3);
+    });
+
+    it("defaults n to 1 for singular 'longest book'", () => {
+      const result = parseQuery("What is the longest book?");
+      expect(result?.intent).toBe("longest_books");
+      expect(result?.params.n).toBe(1);
+    });
+
+    it("defaults n to 5 for plural with no number", () => {
+      const result = parseQuery("Show me the longest books");
+      expect(result?.intent).toBe("longest_books");
+      expect(result?.params.n).toBe(5);
+    });
+
+    it('matches "what\'s my biggest book"', () => {
+      expect(parseQuery("what's my biggest book")?.intent).toBe("longest_books");
+    });
+  });
+
+  describe("shortest_books", () => {
+    it("matches 'shortest book'", () => {
+      expect(parseQuery("What is the shortest book?")?.intent).toBe("shortest_books");
+    });
+
+    it("defaults n to 1 for singular 'shortest book'", () => {
+      const result = parseQuery("What is the shortest book?");
+      expect(result?.params.n).toBe(1);
+    });
+
+    it("extracts n from 'show the 4 shortest books'", () => {
+      const result = parseQuery("Show the 4 shortest books");
+      expect(result?.intent).toBe("shortest_books");
+      expect(result?.params.n).toBe(4);
+    });
+  });
+
   describe("user_count", () => {
     it.each([
       "How many users are there?",

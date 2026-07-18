@@ -12,6 +12,8 @@ interface BookFormProps {
     genre: string;
     price: number;
     rating: number | null;
+    totalPages: number | null;
+    currentPage: number | null;
     readingStatus: ReadingStatus;
   };
 }
@@ -40,6 +42,9 @@ export function BookForm({ bookId, initial }: BookFormProps) {
   });
   const [price, setPrice] = useState(initial?.price != null ? String(initial.price) : "");
   const [rating, setRating] = useState<number | null>(initial?.rating ?? null);
+  const [totalPages, setTotalPages] = useState(initial?.totalPages != null ? String(initial.totalPages) : "");
+  const [currentPage, setCurrentPage] = useState(initial?.currentPage != null ? String(initial.currentPage) : "");
+  const [milestone, setMilestone] = useState<string | null>(null);
   const [customGenre, setCustomGenre] = useState(
     initial?.genre && !COMMON_GENRES.includes(initial.genre) ? initial.genre : ""
   );
@@ -66,9 +71,33 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       return;
     }
 
+    const parsedTotalPages = totalPages.trim() === "" ? null : Number(totalPages);
+    if (parsedTotalPages !== null && (!Number.isInteger(parsedTotalPages) || parsedTotalPages <= 0)) {
+      setError("Total pages must be a positive whole number.");
+      return;
+    }
+
+    const parsedCurrentPage = currentPage.trim() === "" ? null : Number(currentPage);
+    if (parsedCurrentPage !== null && (!Number.isInteger(parsedCurrentPage) || parsedCurrentPage <= 0)) {
+      setError("Current page must be a positive whole number.");
+      return;
+    }
+
+    if (parsedTotalPages !== null && parsedCurrentPage !== null && parsedCurrentPage > parsedTotalPages) {
+      setError("Current page cannot exceed total pages.");
+      return;
+    }
+
     setLoading(true);
 
-    const payload = { ...form, genre: effectiveGenre.trim(), price: parsedPrice, rating };
+    const payload = {
+      ...form,
+      genre: effectiveGenre.trim(),
+      price: parsedPrice,
+      rating,
+      totalPages: parsedTotalPages,
+      currentPage: parsedCurrentPage,
+    };
     const url = isEdit ? `/api/books/${bookId}` : "/api/books";
     const method = isEdit ? "PUT" : "POST";
 
@@ -86,6 +115,12 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       return;
     }
 
+    const data = await res.json();
+    if (data.milestone === "halfway") {
+      setMilestone("halfway");
+      return;
+    }
+
     router.push("/dashboard");
     router.refresh();
   }
@@ -95,6 +130,22 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
           {error}
+        </div>
+      )}
+
+      {milestone === "halfway" && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between gap-3">
+          <p className="text-sm font-medium text-blue-900">Halfway there — keep going!</p>
+          <button
+            type="button"
+            className="btn-secondary text-xs px-3 py-1.5 flex-shrink-0"
+            onClick={() => {
+              router.push("/dashboard");
+              router.refresh();
+            }}
+          >
+            Back to My Books
+          </button>
         </div>
       )}
 
@@ -179,6 +230,35 @@ export function BookForm({ bookId, initial }: BookFormProps) {
           step="0.01"
           placeholder="0.00"
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="label" htmlFor="totalPages">Total Pages</label>
+          <input
+            id="totalPages"
+            type="number"
+            className="input"
+            value={totalPages}
+            onChange={(e) => setTotalPages(e.target.value)}
+            min={1}
+            step="1"
+            placeholder="e.g. 320"
+          />
+        </div>
+        <div>
+          <label className="label" htmlFor="currentPage">Current Page</label>
+          <input
+            id="currentPage"
+            type="number"
+            className="input"
+            value={currentPage}
+            onChange={(e) => setCurrentPage(e.target.value)}
+            min={1}
+            step="1"
+            placeholder="e.g. 120"
+          />
+        </div>
       </div>
 
       <div>

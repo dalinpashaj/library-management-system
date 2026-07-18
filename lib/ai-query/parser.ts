@@ -60,6 +60,33 @@ const rules: Rule[] = [
     },
   },
   {
+    patterns: [
+      /longest books?/i,
+      /biggest books?/i,
+    ],
+    intent: "longest_books",
+    extractParams: (_match, question) => {
+      const numMatch = question.match(/\b(\d+)\b/);
+      if (numMatch) return { n: parseInt(numMatch[1], 10) };
+      if (/\bbook\b/i.test(question) && !/\bbooks\b/i.test(question)) {
+        return { n: 1 };
+      }
+      return { n: 5 };
+    },
+  },
+  {
+    patterns: [/shortest books?/i],
+    intent: "shortest_books",
+    extractParams: (_match, question) => {
+      const numMatch = question.match(/\b(\d+)\b/);
+      if (numMatch) return { n: parseInt(numMatch[1], 10) };
+      if (/\bbook\b/i.test(question) && !/\bbooks\b/i.test(question)) {
+        return { n: 1 };
+      }
+      return { n: 5 };
+    },
+  },
+  {
     patterns: [/how many users/i, /total (number of )?users/i, /user count/i],
     intent: "user_count",
     extractParams: () => ({}),

@@ -4,14 +4,21 @@ import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
 import { ReadingStatus } from "@prisma/client";
 
-const bookSchema = z.object({
-  title: z.string().min(1).max(255),
-  author: z.string().min(1).max(255),
-  genre: z.string().min(1).max(100),
-  price: z.number().min(0).optional().default(0),
-  rating: z.number().int().min(1).max(5).nullable().optional(),
-  readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
-});
+const bookSchema = z
+  .object({
+    title: z.string().min(1).max(255),
+    author: z.string().min(1).max(255),
+    genre: z.string().min(1).max(100),
+    price: z.number().min(0).optional().default(0),
+    rating: z.number().int().min(1).max(5).nullable().optional(),
+    totalPages: z.number().int().positive().nullable().optional(),
+    currentPage: z.number().int().positive().nullable().optional(),
+    readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
+  })
+  .refine(
+    (data) => data.totalPages == null || data.currentPage == null || data.currentPage <= data.totalPages,
+    { message: "Current page cannot exceed total pages.", path: ["currentPage"] }
+  );
 
 export async function GET(req: NextRequest) {
   const { session, error } = await requireAuth();

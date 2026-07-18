@@ -36,6 +36,8 @@ model Book {
   genre         String
   price         Float         @default(0)
   rating        Int?
+  totalPages    Int?
+  currentPage   Int?
   readingStatus ReadingStatus @default(want_to_read)
   ownerId       String
   createdAt     DateTime      @default(now())

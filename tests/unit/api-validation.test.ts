@@ -10,14 +10,21 @@ const registerSchema = z.object({
   password: z.string().min(8),
 });
 
-const bookSchema = z.object({
-  title: z.string().min(1).max(255),
-  author: z.string().min(1).max(255),
-  genre: z.string().min(1).max(100),
-  price: z.number().min(0).optional().default(0),
-  rating: z.number().int().min(1).max(5).nullable().optional(),
-  readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
-});
+const bookSchema = z
+  .object({
+    title: z.string().min(1).max(255),
+    author: z.string().min(1).max(255),
+    genre: z.string().min(1).max(100),
+    price: z.number().min(0).optional().default(0),
+    rating: z.number().int().min(1).max(5).nullable().optional(),
+    totalPages: z.number().int().positive().nullable().optional(),
+    currentPage: z.number().int().positive().nullable().optional(),
+    readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
+  })
+  .refine(
+    (data) => data.totalPages == null || data.currentPage == null || data.currentPage <= data.totalPages,
+    { message: "Current page cannot exceed total pages.", path: ["currentPage"] }
+  );
 
 describe("register schema", () => {
   it("accepts valid registration data", () => {
@@ -106,5 +113,50 @@ describe("book schema", () => {
 
   it("rejects a non-integer rating", () => {
     expect(bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", rating: 3.5 }).success).toBe(false);
+  });
+
+  it("leaves totalPages/currentPage undefined when omitted", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi" });
+    expect(result.success).toBe(true);
+    expect(result.data?.totalPages).toBeUndefined();
+    expect(result.data?.currentPage).toBeUndefined();
+  });
+
+  it("accepts explicit totalPages and currentPage", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: 400, currentPage: 100 });
+    expect(result.success).toBe(true);
+    expect(result.data?.totalPages).toBe(400);
+    expect(result.data?.currentPage).toBe(100);
+  });
+
+  it("accepts explicit null for totalPages/currentPage", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: null, currentPage: null });
+    expect(result.success).toBe(true);
+    expect(result.data?.totalPages).toBeNull();
+    expect(result.data?.currentPage).toBeNull();
+  });
+
+  it("rejects a zero or negative totalPages", () => {
+    expect(bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: 0 }).success).toBe(false);
+    expect(bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: -10 }).success).toBe(false);
+  });
+
+  it("rejects a non-integer totalPages", () => {
+    expect(bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: 400.5 }).success).toBe(false);
+  });
+
+  it("rejects currentPage greater than totalPages", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: 100, currentPage: 150 });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts currentPage equal to totalPages", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", totalPages: 100, currentPage: 100 });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts currentPage without totalPages (no cross-field conflict)", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", currentPage: 50 });
+    expect(result.success).toBe(true);
   });
 });

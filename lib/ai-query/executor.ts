@@ -65,6 +65,38 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       return { data: books, summary };
     }
 
+    case "longest_books": {
+      const n = Number(params.n ?? 5);
+      const books = await prisma.book.findMany({
+        where: { totalPages: { not: null } },
+        include: { owner: { select: { name: true } } },
+        orderBy: { totalPages: "desc" },
+        take: n,
+      });
+      if (books.length === 0) return { data: [], summary: "No books with page counts found." };
+      const summary =
+        n === 1
+          ? `The longest book is "${books[0].title}" by ${books[0].author} at ${books[0].totalPages} pages.`
+          : `Here are the ${books.length} longest book(s), sorted by page count (highest first).`;
+      return { data: books, summary };
+    }
+
+    case "shortest_books": {
+      const n = Number(params.n ?? 5);
+      const books = await prisma.book.findMany({
+        where: { totalPages: { not: null } },
+        include: { owner: { select: { name: true } } },
+        orderBy: { totalPages: "asc" },
+        take: n,
+      });
+      if (books.length === 0) return { data: [], summary: "No books with page counts found." };
+      const summary =
+        n === 1
+          ? `The shortest book is "${books[0].title}" by ${books[0].author} at ${books[0].totalPages} pages.`
+          : `Here are the ${books.length} shortest book(s), sorted by page count (lowest first).`;
+      return { data: books, summary };
+    }
+
     case "user_count": {
       const count = await prisma.user.count();
       return { data: { count }, summary: `There are ${count} registered user(s) in the system.` };

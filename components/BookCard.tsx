@@ -11,6 +11,8 @@ interface Book {
   genre: string;
   price: number;
   rating: number | null;
+  totalPages: number | null;
+  currentPage: number | null;
   readingStatus: "reading" | "completed" | "want_to_read";
   owner?: { name: string };
 }
@@ -63,6 +65,20 @@ export function BookCard({ book, showOwner = false }: { book: Book; showOwner?: 
           <span className="text-gray-400">· {book.owner.name}</span>
         )}
       </div>
+
+      {book.totalPages != null && book.currentPage != null && (
+        <div>
+          <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+            <div
+              className="h-full bg-primary-600 rounded-full"
+              style={{ width: `${Math.min(100, (book.currentPage / book.totalPages) * 100)}%` }}
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            {book.currentPage} / {book.totalPages} pages
+          </p>
+        </div>
+      )}
 
       <div className="flex gap-2 mt-auto pt-2 border-t border-gray-100">
         <Link href={`/dashboard/books/${book.id}/edit`} className="btn-secondary text-xs px-3 py-1.5">

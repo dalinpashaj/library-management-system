@@ -3,6 +3,8 @@ export type QueryIntent =
   | "most_popular_book"
   | "most_expensive_books"
   | "most_highly_rated_books"
+  | "longest_books"
+  | "shortest_books"
   | "books_by_genre"
   | "books_by_status"
   | "books_by_author"
