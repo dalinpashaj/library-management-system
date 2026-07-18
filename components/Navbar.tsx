@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { BookOpen } from "lucide-react";
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -18,9 +19,10 @@ export function Navbar() {
     : [];
 
   return (
-    <nav className="bg-white border-b border-gray-200 h-16 flex items-center px-4 md:px-8">
+    <nav className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-200 h-16 flex items-center px-4 md:px-8 shadow-sm">
       <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
-        <Link href="/" className="text-lg font-bold text-primary-700">
+        <Link href="/" className="flex items-center gap-1.5 text-lg font-bold text-primary-700">
+          <BookOpen className="h-5 w-5" />
           LibraryMS
         </Link>
 

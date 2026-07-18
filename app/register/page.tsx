@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BookOpen } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,10 +45,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gradient-to-b from-primary-50/60 to-gray-50 px-4">
       <div className="w-full max-w-md">
-        <div className="card">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Account</h1>
+        <div className="card shadow-md">
+          <div className="mb-6 flex flex-col items-center text-center">
+            <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+              <BookOpen className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
+          </div>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">

@@ -30,4 +30,7 @@
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
+  .chip {
+    @apply inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700;
+  }
 }
