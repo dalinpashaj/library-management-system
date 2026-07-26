@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { parsePaginationInt } from "@/lib/pagination";
+import { isValidReadingStatus } from "@/lib/reading-status";
 import { ReadingStatus } from "@prisma/client";
 
 const bookSchema = z
@@ -25,11 +27,12 @@ export async function GET(req: NextRequest) {
   if (error) return error;
 
   const { searchParams } = new URL(req.url);
-  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "20")));
+  const page = parsePaginationInt(searchParams.get("page"), 1);
+  const limit = parsePaginationInt(searchParams.get("limit"), 20, { max: 100 });
   const skip = (page - 1) * limit;
   const genre = searchParams.get("genre");
-  const status = searchParams.get("status") as ReadingStatus | null;
+  const statusParam = searchParams.get("status");
+  const status = isValidReadingStatus(statusParam) ? statusParam : null;
   const search = searchParams.get("search");
 
   const isAdmin = session!.user.role === "admin";

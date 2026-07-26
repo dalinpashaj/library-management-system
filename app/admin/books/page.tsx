@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { AdminBookRow } from "@/components/AdminBookRow";
+import { parsePaginationInt } from "@/lib/pagination";
+import { isValidReadingStatus } from "@/lib/reading-status";
 
 interface SearchParams { search?: string; genre?: string; status?: string; page?: string }
 
@@ -12,13 +14,14 @@ export default async function AdminBooksPage({ searchParams }: { searchParams: S
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/dashboard");
 
-  const page = Math.max(1, parseInt(searchParams.page ?? "1"));
+  const page = parsePaginationInt(searchParams.page, 1);
   const limit = 20;
   const skip = (page - 1) * limit;
+  const status = isValidReadingStatus(searchParams.status) ? searchParams.status : undefined;
 
   const where = {
     ...(searchParams.genre ? { genre: searchParams.genre } : {}),
-    ...(searchParams.status ? { readingStatus: searchParams.status as "reading" | "completed" | "want_to_read" } : {}),
+    ...(status ? { readingStatus: status } : {}),
     ...(searchParams.search
       ? {
           OR: [

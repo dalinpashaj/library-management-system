@@ -16,24 +16,42 @@ export function AdminUserRow({ user, currentUserId }: { user: User; currentUserI
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [promoting, setPromoting] = useState(false);
+  const [error, setError] = useState("");
   const isSelf = user.id === currentUserId;
 
   async function handleDelete() {
     if (!confirm(`Delete user "${user.name}" and all their books?`)) return;
     setDeleting(true);
-    await fetch(`/api/users/${user.id}`, { method: "DELETE" });
+    setError("");
+    const res = await fetch(`/api/users/${user.id}`, { method: "DELETE" });
+    setDeleting(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? "Failed to delete user.");
+      return;
+    }
+
     router.refresh();
   }
 
   async function handleToggleRole() {
     setPromoting(true);
+    setError("");
     const newRole = user.role === "admin" ? "user" : "admin";
-    await fetch(`/api/users/${user.id}`, {
+    const res = await fetch(`/api/users/${user.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ role: newRole }),
     });
     setPromoting(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? "Failed to update role.");
+      return;
+    }
+
     router.refresh();
   }
 
@@ -69,6 +87,7 @@ export function AdminUserRow({ user, currentUserId }: { user: User; currentUserI
             </button>
           </div>
         )}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         {isSelf && <span className="text-xs text-gray-400">You</span>}
       </td>
     </tr>

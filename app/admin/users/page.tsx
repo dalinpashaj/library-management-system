@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { AdminUserRow } from "@/components/AdminUserRow";
+import { parsePaginationInt } from "@/lib/pagination";
 
 interface SearchParams { search?: string; page?: string }
 
@@ -12,7 +13,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/dashboard");
 
-  const page = Math.max(1, parseInt(searchParams.page ?? "1"));
+  const page = parsePaginationInt(searchParams.page, 1);
   const limit = 20;
   const skip = (page - 1) * limit;
 

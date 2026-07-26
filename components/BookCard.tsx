@@ -32,11 +32,21 @@ const STATUS_LABELS = {
 export function BookCard({ book, showOwner = false }: { book: Book; showOwner?: boolean }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleDelete() {
     if (!confirm(`Delete "${book.title}"?`)) return;
     setDeleting(true);
-    await fetch(`/api/books/${book.id}`, { method: "DELETE" });
+    setError("");
+    const res = await fetch(`/api/books/${book.id}`, { method: "DELETE" });
+    setDeleting(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? "Failed to delete book.");
+      return;
+    }
+
     router.refresh();
   }
 
@@ -79,6 +89,8 @@ export function BookCard({ book, showOwner = false }: { book: Book; showOwner?: 
           </p>
         </div>
       )}
+
+      {error && <p className="text-xs text-red-600">{error}</p>}
 
       <div className="flex gap-2 mt-auto pt-2 border-t border-gray-100">
         <Link href={`/dashboard/books/${book.id}/edit`} className="btn-secondary text-xs px-3 py-1.5">

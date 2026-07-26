@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-helpers";
+import { parsePaginationInt } from "@/lib/pagination";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireAdmin();
   if (error) return error;
 
   const { searchParams } = new URL(req.url);
-  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "20")));
+  const page = parsePaginationInt(searchParams.get("page"), 1);
+  const limit = parsePaginationInt(searchParams.get("limit"), 20, { max: 100 });
   const skip = (page - 1) * limit;
   const search = searchParams.get("search");
 

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { BookCard } from "@/components/BookCard";
+import { parsePaginationInt } from "@/lib/pagination";
+import { isValidReadingStatus } from "@/lib/reading-status";
 
 interface SearchParams {
   genre?: string;
@@ -20,14 +22,15 @@ export default async function DashboardPage({
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  const page = Math.max(1, parseInt(searchParams.page ?? "1"));
+  const page = parsePaginationInt(searchParams.page, 1);
   const limit = 12;
   const skip = (page - 1) * limit;
+  const status = isValidReadingStatus(searchParams.status) ? searchParams.status : undefined;
 
   const where = {
     ownerId: session.user.id,
     ...(searchParams.genre ? { genre: searchParams.genre } : {}),
-    ...(searchParams.status ? { readingStatus: searchParams.status as "reading" | "completed" | "want_to_read" } : {}),
+    ...(status ? { readingStatus: status } : {}),
     ...(searchParams.search
       ? {
           OR: [
