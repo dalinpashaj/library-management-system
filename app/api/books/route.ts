@@ -15,6 +15,7 @@ const bookSchema = z
     rating: z.number().int().min(1).max(5).nullable().optional(),
     totalPages: z.number().int().positive().nullable().optional(),
     currentPage: z.number().int().positive().nullable().optional(),
+    coverUrl: z.string().url().nullable().optional(),
     readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
   })
   .refine(

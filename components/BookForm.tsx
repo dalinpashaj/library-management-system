@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReadingStatus } from "@prisma/client";
 
@@ -16,6 +16,13 @@ interface BookFormProps {
     currentPage: number | null;
     readingStatus: ReadingStatus;
   };
+}
+
+interface BookSearchResult {
+  title: string;
+  author: string;
+  totalPages: number | null;
+  coverUrl: string | null;
 }
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
@@ -44,7 +51,12 @@ export function BookForm({ bookId, initial }: BookFormProps) {
   const [rating, setRating] = useState<number | null>(initial?.rating ?? null);
   const [totalPages, setTotalPages] = useState(initial?.totalPages != null ? String(initial.totalPages) : "");
   const [currentPage, setCurrentPage] = useState(initial?.currentPage != null ? String(initial.currentPage) : "");
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [milestone, setMilestone] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<BookSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const [customGenre, setCustomGenre] = useState(
     initial?.genre && !COMMON_GENRES.includes(initial.genre) ? initial.genre : ""
   );
@@ -55,6 +67,51 @@ export function BookForm({ bookId, initial }: BookFormProps) {
   const [loading, setLoading] = useState(false);
 
   const effectiveGenre = useCustomGenre ? customGenre : form.genre;
+
+  useEffect(() => {
+    if (isEdit) return;
+
+    const trimmed = searchQuery.trim();
+    if (trimmed.length < 2) {
+      setSearchResults([]);
+      setSearching(false);
+      setSearchError("");
+      return;
+    }
+
+    setSearching(true);
+    setSearchError("");
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/book-search?q=${encodeURIComponent(trimmed)}`);
+        if (!res.ok) {
+          setSearchResults([]);
+          setSearchError("Search is unavailable right now — you can still fill in the details below yourself.");
+          return;
+        }
+        const data = await res.json();
+        setSearchResults(Array.isArray(data.results) ? data.results : []);
+      } catch {
+        setSearchResults([]);
+        setSearchError("Search is unavailable right now — you can still fill in the details below yourself.");
+      } finally {
+        setSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, isEdit]);
+
+  function handleSelectResult(result: BookSearchResult) {
+    setForm((f) => ({ ...f, title: result.title, author: result.author }));
+    if (result.totalPages != null) {
+      setTotalPages(String(result.totalPages));
+    }
+    setCoverUrl(result.coverUrl);
+    setSearchResults([]);
+    setSearchQuery("");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -97,6 +154,7 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       rating,
       totalPages: parsedTotalPages,
       currentPage: parsedCurrentPage,
+      ...(isEdit ? {} : { coverUrl }),
     };
     const url = isEdit ? `/api/books/${bookId}` : "/api/books";
     const method = isEdit ? "PUT" : "POST";
@@ -146,6 +204,64 @@ export function BookForm({ bookId, initial }: BookFormProps) {
           >
             Back to My Books
           </button>
+        </div>
+      )}
+
+      {!isEdit && (
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-md space-y-3">
+          <div>
+            <label className="label" htmlFor="book-search">Search for a book (optional)</label>
+            <input
+              id="book-search"
+              type="text"
+              className="input"
+              placeholder="e.g. The Hobbit"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Powered by Open Library. Pick a result to pre-fill the fields below, or just type them in yourself.
+            </p>
+          </div>
+
+          {searching && <p className="text-xs text-gray-500">Searching…</p>}
+
+          {searchError && <p className="text-xs text-red-600">{searchError}</p>}
+
+          {!searching && searchResults.length > 0 && (
+            <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md bg-white max-h-64 overflow-y-auto">
+              {searchResults.map((result, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectResult(result)}
+                    className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    {result.coverUrl ? (
+                      <>
+                        <img
+                          src={result.coverUrl}
+                          alt=""
+                          className="w-10 h-14 object-cover rounded flex-shrink-0 bg-gray-100"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.nextElementSibling?.classList.remove("hidden");
+                          }}
+                        />
+                        <div className="hidden w-10 h-14 rounded flex-shrink-0 bg-gray-200" />
+                      </>
+                    ) : (
+                      <div className="w-10 h-14 rounded flex-shrink-0 bg-gray-200" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{result.title}</p>
+                      <p className="text-xs text-gray-600 truncate">{result.author}</p>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 

@@ -19,6 +19,7 @@ const bookSchema = z
     rating: z.number().int().min(1).max(5).nullable().optional(),
     totalPages: z.number().int().positive().nullable().optional(),
     currentPage: z.number().int().positive().nullable().optional(),
+    coverUrl: z.string().url().nullable().optional(),
     readingStatus: z.nativeEnum(ReadingStatus).optional().default(ReadingStatus.want_to_read),
   })
   .refine(
@@ -158,5 +159,33 @@ describe("book schema", () => {
   it("accepts currentPage without totalPages (no cross-field conflict)", () => {
     const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", currentPage: 50 });
     expect(result.success).toBe(true);
+  });
+
+  it("leaves coverUrl undefined when omitted", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi" });
+    expect(result.success).toBe(true);
+    expect(result.data?.coverUrl).toBeUndefined();
+  });
+
+  it("accepts an explicit coverUrl", () => {
+    const result = bookSchema.safeParse({
+      title: "Dune",
+      author: "Herbert",
+      genre: "SciFi",
+      coverUrl: "https://covers.openlibrary.org/b/id/1-M.jpg",
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.coverUrl).toBe("https://covers.openlibrary.org/b/id/1-M.jpg");
+  });
+
+  it("accepts an explicit null coverUrl", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", coverUrl: null });
+    expect(result.success).toBe(true);
+    expect(result.data?.coverUrl).toBeNull();
+  });
+
+  it("rejects a non-URL coverUrl", () => {
+    const result = bookSchema.safeParse({ title: "Dune", author: "Herbert", genre: "SciFi", coverUrl: "not-a-url" });
+    expect(result.success).toBe(false);
   });
 });

@@ -13,6 +13,7 @@ interface Book {
   rating: number | null;
   totalPages: number | null;
   currentPage: number | null;
+  coverUrl: string | null;
   readingStatus: "reading" | "completed" | "want_to_read";
   owner?: { name: string };
 }
@@ -53,9 +54,21 @@ export function BookCard({ book, showOwner = false }: { book: Book; showOwner?: 
   return (
     <div className="card flex flex-col gap-3 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate">{book.title}</h3>
-          <p className="text-sm text-gray-600 truncate">{book.author}</p>
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          {book.coverUrl && (
+            <img
+              src={book.coverUrl}
+              alt=""
+              className="w-10 h-14 object-cover rounded flex-shrink-0 bg-gray-100"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          )}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 truncate">{book.title}</h3>
+            <p className="text-sm text-gray-600 truncate">{book.author}</p>
+          </div>
         </div>
         <span className={`badge ${STATUS_STYLES[book.readingStatus]} flex-shrink-0`}>
           {STATUS_LABELS[book.readingStatus]}

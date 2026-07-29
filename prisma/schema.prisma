@@ -38,6 +38,7 @@ model Book {
   rating        Int?
   totalPages    Int?
   currentPage   Int?
+  coverUrl      String?
   readingStatus ReadingStatus @default(want_to_read)
   ownerId       String
   createdAt     DateTime      @default(now())
