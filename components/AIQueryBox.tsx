@@ -22,31 +22,48 @@ const EXAMPLE_QUESTIONS = [
   "How many users are there?",
 ];
 
-function renderData(data: QueryResult["data"]) {
-  if (!data) return null;
+const BOOK_COLUMNS = ["title", "author", "genre", "price"] as const;
 
-  if (Array.isArray(data) && data.length > 0) {
-    const columns = Object.keys(data[0]).filter(
-      (k) => k !== "_count" && typeof data[0][k] !== "object"
-    );
+function isBookRow(row: RowData): boolean {
+  return "title" in row && "author" in row;
+}
+
+function formatCellValue(key: string, value: RowData[string]): string {
+  if (value == null) return "—";
+  if (key === "price" && typeof value === "number") return `$${value.toFixed(2)}`;
+  return String(value);
+}
+
+function renderData(data: QueryResult["data"]) {
+  if (data == null) return null;
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return <p className="py-6 text-center text-sm text-gray-500">No results found.</p>;
+    }
+
+    const columns: string[] = isBookRow(data[0])
+      ? [...BOOK_COLUMNS]
+      : Object.keys(data[0]).filter((k) => k !== "_count" && typeof data[0][k] !== "object");
+
     return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-lg border border-gray-100">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               {columns.map((key) => (
-                <th key={key} className="px-4 py-2 text-left font-medium text-gray-700">
+                <th key={key} className="px-4 py-3 text-left font-medium text-gray-600">
                   {key}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {data.map((row, i) => (
-              <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
+              <tr key={i} className="hover:bg-gray-50">
                 {columns.map((key) => (
-                  <td key={key} className="px-4 py-2 text-gray-800">
-                    {row[key] == null ? "—" : String(row[key])}
+                  <td key={key} className="px-4 py-3 text-gray-800">
+                    {formatCellValue(key, row[key])}
                   </td>
                 ))}
               </tr>
@@ -57,16 +74,16 @@ function renderData(data: QueryResult["data"]) {
     );
   }
 
-  if (!Array.isArray(data) && typeof data === "object" && data !== null) {
+  if (typeof data === "object") {
     const entries = Object.entries(data).filter(([, v]) => typeof v !== "object");
     return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-lg border border-gray-100">
         <table className="w-full text-sm">
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {entries.map(([key, val]) => (
-              <tr key={key} className="border-b border-gray-100">
-                <td className="px-4 py-2 font-medium text-gray-700 w-1/3">{key}</td>
-                <td className="px-4 py-2 text-gray-800">{val == null ? "—" : String(val)}</td>
+              <tr key={key}>
+                <td className="px-4 py-3 font-medium text-gray-600 w-1/3">{key}</td>
+                <td className="px-4 py-3 text-gray-800">{val == null ? "—" : String(val)}</td>
               </tr>
             ))}
           </tbody>
@@ -145,8 +162,8 @@ export function AIQueryBox() {
 
       {result && (
         <div className="space-y-3">
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm font-medium text-blue-900">{result.naturalLanguageSummary}</p>
+          <div className="p-4 bg-blue-50/60 border border-blue-100 rounded-lg">
+            <p className="text-sm text-gray-700">{result.naturalLanguageSummary}</p>
           </div>
 
           {renderData(result.data)}

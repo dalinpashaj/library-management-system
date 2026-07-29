@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/db";
 import type { ParsedQuery } from "./types";
 
+function pluralize(count: number, singular: string): string {
+  return count === 1 ? singular : `${singular}s`;
+}
+
+function joinWithAnd(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
 export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown; summary: string }> {
   const { intent, params } = parsed;
 
@@ -15,7 +25,7 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       if (!top) return { data: [], summary: "No users found." };
       return {
         data: top,
-        summary: `${top.name} owns the most books with ${top._count.books} book(s).`,
+        summary: `${top.name} owns the most books with ${top._count.books} ${pluralize(top._count.books, "book")}.`,
       };
     }
 
@@ -43,9 +53,9 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       });
       if (books.length === 0) return { data: [], summary: "No books found." };
       const summary =
-        n === 1
+        books.length === 1
           ? `The most expensive book is "${books[0].title}" by ${books[0].author} at $${books[0].price.toFixed(2)}.`
-          : `Here are the ${books.length} most expensive book(s), sorted by price (highest first).`;
+          : `Here are the ${books.length} most expensive books, sorted by price (highest first).`;
       return { data: books, summary };
     }
 
@@ -59,9 +69,9 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       });
       if (books.length === 0) return { data: [], summary: "No rated books found." };
       const summary =
-        n === 1
+        books.length === 1
           ? `The highest rated book is "${books[0].title}" by ${books[0].author} at ${books[0].rating}/5.`
-          : `Here are the ${books.length} highest rated book(s), sorted by rating (highest first).`;
+          : `Here are the ${books.length} highest rated books, sorted by rating (highest first).`;
       return { data: books, summary };
     }
 
@@ -75,9 +85,9 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       });
       if (books.length === 0) return { data: [], summary: "No books with page counts found." };
       const summary =
-        n === 1
+        books.length === 1
           ? `The longest book is "${books[0].title}" by ${books[0].author} at ${books[0].totalPages} pages.`
-          : `Here are the ${books.length} longest book(s), sorted by page count (highest first).`;
+          : `Here are the ${books.length} longest books, sorted by page count (highest first).`;
       return { data: books, summary };
     }
 
@@ -91,20 +101,26 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       });
       if (books.length === 0) return { data: [], summary: "No books with page counts found." };
       const summary =
-        n === 1
+        books.length === 1
           ? `The shortest book is "${books[0].title}" by ${books[0].author} at ${books[0].totalPages} pages.`
-          : `Here are the ${books.length} shortest book(s), sorted by page count (lowest first).`;
+          : `Here are the ${books.length} shortest books, sorted by page count (lowest first).`;
       return { data: books, summary };
     }
 
     case "user_count": {
       const count = await prisma.user.count();
-      return { data: { count }, summary: `There are ${count} registered user(s) in the system.` };
+      return {
+        data: { count },
+        summary: `There ${count === 1 ? "is" : "are"} ${count} registered ${pluralize(count, "user")} in the system.`,
+      };
     }
 
     case "book_count": {
       const count = await prisma.book.count();
-      return { data: { count }, summary: `There are ${count} book(s) in the library.` };
+      return {
+        data: { count },
+        summary: `There ${count === 1 ? "is" : "are"} ${count} ${pluralize(count, "book")} in the library.`,
+      };
     }
 
     case "books_by_genre": {
@@ -116,7 +132,7 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
       });
       return {
         data: books,
-        summary: `Found ${books.length} book(s) in the "${genre}" genre.`,
+        summary: `Found ${books.length} ${pluralize(books.length, "book")} in the "${genre}" genre.`,
       };
     }
 
@@ -128,7 +144,10 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         orderBy: { createdAt: "desc" },
       });
       const label = { reading: "Reading", completed: "Completed", want_to_read: "Want to Read" }[status];
-      return { data: books, summary: `Found ${books.length} book(s) with status "${label}".` };
+      return {
+        data: books,
+        summary: `Found ${books.length} ${pluralize(books.length, "book")} with status "${label}".`,
+      };
     }
 
     case "books_by_author": {
@@ -138,7 +157,10 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         include: { owner: { select: { name: true } } },
         orderBy: { createdAt: "desc" },
       });
-      return { data: books, summary: `Found ${books.length} book(s) by "${author}".` };
+      return {
+        data: books,
+        summary: `Found ${books.length} ${pluralize(books.length, "book")} by "${author}".`,
+      };
     }
 
     case "top_n_books": {
@@ -148,7 +170,10 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         orderBy: { createdAt: "desc" },
         take: n,
       });
-      return { data: books, summary: `Here are the ${books.length} most recently added book(s).` };
+      return {
+        data: books,
+        summary: `Here are the ${books.length} most recently added ${pluralize(books.length, "book")}.`,
+      };
     }
 
     case "genre_breakdown": {
@@ -157,8 +182,9 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         _count: { genre: true },
         orderBy: { _count: { genre: "desc" } },
       });
-      const summary = groups.map((g) => `${g.genre}: ${g._count.genre}`).join(", ");
-      return { data: groups, summary: `Genre breakdown — ${summary}.` };
+      if (groups.length === 0) return { data: [], summary: "No books found." };
+      const parts = groups.map((g) => `${g._count.genre} ${g.genre} ${pluralize(g._count.genre, "book")}`);
+      return { data: groups, summary: `Your library has ${joinWithAnd(parts)}.` };
     }
 
     case "status_breakdown": {
@@ -167,13 +193,16 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         _count: { readingStatus: true },
         orderBy: { _count: { readingStatus: "desc" } },
       });
+      if (groups.length === 0) return { data: [], summary: "No books found." };
       const labels: Record<string, string> = {
         reading: "Reading",
         completed: "Completed",
         want_to_read: "Want to Read",
       };
-      const summary = groups.map((g) => `${labels[g.readingStatus] ?? g.readingStatus}: ${g._count.readingStatus}`).join(", ");
-      return { data: groups, summary: `Status breakdown — ${summary}.` };
+      const parts = groups.map(
+        (g) => `${g._count.readingStatus} ${labels[g.readingStatus] ?? g.readingStatus} ${pluralize(g._count.readingStatus, "book")}`
+      );
+      return { data: groups, summary: `Your library has ${joinWithAnd(parts)}.` };
     }
 
     case "recent_books": {
@@ -183,7 +212,10 @@ export async function executeQuery(parsed: ParsedQuery): Promise<{ data: unknown
         orderBy: { createdAt: "desc" },
         take: n,
       });
-      return { data: books, summary: `Here are the ${books.length} most recently added book(s).` };
+      return {
+        data: books,
+        summary: `Here are the ${books.length} most recently added ${pluralize(books.length, "book")}.`,
+      };
     }
 
     default:
