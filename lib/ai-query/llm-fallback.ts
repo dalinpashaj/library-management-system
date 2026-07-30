@@ -65,7 +65,8 @@ export async function llmFallback(question: string): Promise<ParsedQuery | null>
     if (!parsed.intent || !VALID_INTENTS.includes(parsed.intent)) return null;
 
     return { intent: parsed.intent, params: parsed.params ?? {} };
-  } catch {
+  } catch (err) {
+    console.error("llmFallback error:", err);
     return null;
   }
 }
