@@ -26,8 +26,8 @@ export default async function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">System overview and management</p>
+        <h1 className="font-heading text-2xl font-bold text-ink">Admin Dashboard</h1>
+        <p className="text-sm text-muted mt-1">System overview and management</p>
       </div>
 
       {/* Stats */}
@@ -47,18 +47,18 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Genre breakdown */}
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Top Genres</h2>
+          <h2 className="font-heading font-semibold text-ink mb-4">Top Genres</h2>
           <div className="space-y-2">
             {genreGroups.map((g) => (
               <div key={g.genre} className="flex items-center gap-3">
-                <span className="text-sm text-gray-700 w-32 truncate">{g.genre}</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-2">
+                <span className="text-sm text-ink w-32 truncate">{g.genre}</span>
+                <div className="flex-1 bg-cream rounded-full h-2">
                   <div
-                    className="bg-primary-500 h-2 rounded-full"
+                    className="bg-accent h-2 rounded-full"
                     style={{ width: `${(g._count.genre / bookCount) * 100}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-8 text-right">{g._count.genre}</span>
+                <span className="text-xs text-muted w-8 text-right">{g._count.genre}</span>
               </div>
             ))}
           </div>
@@ -66,18 +66,18 @@ export default async function AdminDashboard() {
 
         {/* Status breakdown */}
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Reading Status</h2>
+          <h2 className="font-heading font-semibold text-ink mb-4">Reading Status</h2>
           <div className="space-y-2">
             {statusGroups.map((s) => (
               <div key={s.readingStatus} className="flex items-center gap-3">
-                <span className="text-sm text-gray-700 w-32">{statusLabels[s.readingStatus]}</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-2">
+                <span className="text-sm text-ink w-32">{statusLabels[s.readingStatus]}</span>
+                <div className="flex-1 bg-cream rounded-full h-2">
                   <div
-                    className="bg-green-500 h-2 rounded-full"
+                    className="bg-accent h-2 rounded-full"
                     style={{ width: `${(s._count.readingStatus / bookCount) * 100}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-8 text-right">{s._count.readingStatus}</span>
+                <span className="text-xs text-muted w-8 text-right">{s._count.readingStatus}</span>
               </div>
             ))}
           </div>
@@ -86,10 +86,9 @@ export default async function AdminDashboard() {
 
       {/* AI Query */}
       <div className="card">
-        <h2 className="font-semibold text-gray-900 mb-4">AI Query Agent</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Ask natural-language questions about the library. The system uses a rule-based intent
-          parser — no free-text SQL is ever executed.
+        <h2 className="font-heading font-semibold text-ink mb-4">AI Query Agent</h2>
+        <p className="text-sm text-muted mb-4">
+          Ask questions about the library.
         </p>
         <AIQueryBox />
       </div>
@@ -100,8 +99,8 @@ export default async function AdminDashboard() {
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="card text-center">
-      <p className="text-3xl font-bold text-primary-700">{value}</p>
-      <p className="text-sm text-gray-600 mt-1">{label}</p>
+      <p className="text-3xl font-bold text-accent">{value}</p>
+      <p className="text-sm text-muted mt-1">{label}</p>
     </div>
   );
 }

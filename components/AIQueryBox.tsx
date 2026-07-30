@@ -39,7 +39,7 @@ function renderData(data: QueryResult["data"]) {
 
   if (Array.isArray(data)) {
     if (data.length === 0) {
-      return <p className="py-6 text-center text-sm text-gray-500">No results found.</p>;
+      return <p className="py-6 text-center text-sm text-muted">No results found.</p>;
     }
 
     const columns: string[] = isBookRow(data[0])
@@ -47,22 +47,22 @@ function renderData(data: QueryResult["data"]) {
       : Object.keys(data[0]).filter((k) => k !== "_count" && typeof data[0][k] !== "object");
 
     return (
-      <div className="overflow-x-auto rounded-lg border border-gray-100">
+      <div className="overflow-x-auto rounded-lg border border-divider">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
+            <tr className="bg-cream border-b border-divider">
               {columns.map((key) => (
-                <th key={key} className="px-4 py-3 text-left font-medium text-gray-600">
+                <th key={key} className="px-4 py-3 text-left font-medium text-muted">
                   {key}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-divider">
             {data.map((row, i) => (
-              <tr key={i} className="hover:bg-gray-50">
+              <tr key={i} className="hover:bg-cream">
                 {columns.map((key) => (
-                  <td key={key} className="px-4 py-3 text-gray-800">
+                  <td key={key} className="px-4 py-3 text-ink">
                     {formatCellValue(key, row[key])}
                   </td>
                 ))}
@@ -77,13 +77,13 @@ function renderData(data: QueryResult["data"]) {
   if (typeof data === "object") {
     const entries = Object.entries(data).filter(([, v]) => typeof v !== "object");
     return (
-      <div className="overflow-x-auto rounded-lg border border-gray-100">
+      <div className="overflow-x-auto rounded-lg border border-divider">
         <table className="w-full text-sm">
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-divider">
             {entries.map(([key, val]) => (
               <tr key={key}>
-                <td className="px-4 py-3 font-medium text-gray-600 w-1/3">{key}</td>
-                <td className="px-4 py-3 text-gray-800">{val == null ? "—" : String(val)}</td>
+                <td className="px-4 py-3 font-medium text-muted w-1/3">{key}</td>
+                <td className="px-4 py-3 text-ink">{val == null ? "—" : String(val)}</td>
               </tr>
             ))}
           </tbody>
@@ -146,7 +146,7 @@ export function AIQueryBox() {
           <button
             key={q}
             type="button"
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors"
+            className="text-xs px-2 py-1 bg-cream hover:bg-divider text-muted rounded-full transition-colors"
             onClick={() => setQuestion(q)}
           >
             {q}
@@ -162,8 +162,8 @@ export function AIQueryBox() {
 
       {result && (
         <div className="space-y-3">
-          <div className="p-4 bg-blue-50/60 border border-blue-100 rounded-lg">
-            <p className="text-sm text-gray-700">{result.naturalLanguageSummary}</p>
+          <div className="p-4 bg-accent/10 border border-accent/20 rounded-lg">
+            <p className="text-sm text-ink">{result.naturalLanguageSummary}</p>
           </div>
 
           {renderData(result.data)}

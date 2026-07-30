@@ -19,9 +19,9 @@ export function Navbar() {
     : [];
 
   return (
-    <nav className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-200 h-16 flex items-center px-4 md:px-8 shadow-sm">
+    <nav className="sticky top-0 z-10 bg-surface/95 backdrop-blur border-b border-divider h-16 flex items-center px-4 md:px-8 shadow-sm">
       <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
-        <Link href="/" className="flex items-center gap-1.5 text-lg font-bold text-primary-700">
+        <Link href="/" className="flex items-center gap-1.5 font-heading text-lg font-bold text-accent">
           <BookOpen className="h-5 w-5" />
           LibraryMS
         </Link>
@@ -33,8 +33,8 @@ export function Navbar() {
               href={link.href}
               className={`text-sm font-medium transition-colors ${
                 pathname.startsWith(link.href)
-                  ? "text-primary-700"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "text-accent"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {link.label}
@@ -43,7 +43,7 @@ export function Navbar() {
 
           {session ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600 hidden md:block">
+              <span className="text-sm text-muted hidden md:block">
                 {session.user.name}
               </span>
               <button

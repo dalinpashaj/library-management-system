@@ -34,14 +34,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gradient-to-b from-primary-50/60 to-gray-50 px-4">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gradient-to-b from-accent/10 to-cream px-4">
       <div className="w-full max-w-md">
         <div className="card shadow-md">
           <div className="mb-6 flex flex-col items-center text-center">
-            <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+            <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
               <BookOpen className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Sign In</h1>
+            <h1 className="font-heading text-2xl font-bold text-ink">Sign In</h1>
           </div>
 
           {error && (
@@ -82,9 +82,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-center text-gray-600">
+          <p className="mt-4 text-sm text-center text-muted">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-primary-600 hover:underline font-medium">
+            <Link href="/register" className="text-accent hover:underline font-medium">
               Register
             </Link>
           </p>

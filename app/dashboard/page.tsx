@@ -73,8 +73,8 @@ export default async function DashboardPage({
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Books</h1>
-          <p className="text-sm text-gray-500 mt-1">{total} book(s) total</p>
+          <h1 className="font-heading text-2xl font-bold text-ink">My Books</h1>
+          <p className="text-sm text-muted mt-1">{total} book(s) total</p>
         </div>
         <Link href="/dashboard/books/new" className="btn-primary">
           + Add Book
@@ -107,7 +107,7 @@ export default async function DashboardPage({
       </form>
 
       {books.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-muted">
           <p className="text-lg mb-2">No books found.</p>
           <Link href="/dashboard/books/new" className="btn-primary">Add your first book</Link>
         </div>
@@ -126,7 +126,7 @@ export default async function DashboardPage({
               Previous
             </Link>
           )}
-          <span className="flex items-center px-4 text-sm text-gray-600">
+          <span className="flex items-center px-4 text-sm text-muted">
             Page {page} of {totalPages}
           </span>
           {page < totalPages && (

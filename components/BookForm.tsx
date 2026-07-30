@@ -192,8 +192,8 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       )}
 
       {milestone === "halfway" && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-blue-900">Halfway there — keep going!</p>
+        <div className="p-4 bg-accent/10 border border-accent/20 rounded-md flex items-center justify-between gap-3">
+          <p className="text-sm font-medium text-ink">Halfway there — keep going!</p>
           <button
             type="button"
             className="btn-secondary text-xs px-3 py-1.5 flex-shrink-0"
@@ -208,7 +208,7 @@ export function BookForm({ bookId, initial }: BookFormProps) {
       )}
 
       {!isEdit && (
-        <div className="p-4 bg-gray-50 border border-gray-200 rounded-md space-y-3">
+        <div className="p-4 bg-cream border border-divider rounded-md space-y-3">
           <div>
             <label className="label" htmlFor="book-search">Search for a book (optional)</label>
             <input
@@ -219,43 +219,43 @@ export function BookForm({ bookId, initial }: BookFormProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted">
               Powered by Open Library. Pick a result to pre-fill the fields below, or just type them in yourself.
             </p>
           </div>
 
-          {searching && <p className="text-xs text-gray-500">Searching…</p>}
+          {searching && <p className="text-xs text-muted">Searching…</p>}
 
           {searchError && <p className="text-xs text-red-600">{searchError}</p>}
 
           {!searching && searchResults.length > 0 && (
-            <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md bg-white max-h-64 overflow-y-auto">
+            <ul className="divide-y divide-divider border border-divider rounded-md bg-surface max-h-64 overflow-y-auto">
               {searchResults.map((result, i) => (
                 <li key={i}>
                   <button
                     type="button"
                     onClick={() => handleSelectResult(result)}
-                    className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center gap-3 p-2 text-left hover:bg-cream transition-colors"
                   >
                     {result.coverUrl ? (
                       <>
                         <img
                           src={result.coverUrl}
                           alt=""
-                          className="w-10 h-14 object-cover rounded flex-shrink-0 bg-gray-100"
+                          className="w-10 h-14 object-cover rounded flex-shrink-0 bg-cream"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                             e.currentTarget.nextElementSibling?.classList.remove("hidden");
                           }}
                         />
-                        <div className="hidden w-10 h-14 rounded flex-shrink-0 bg-gray-200" />
+                        <div className="hidden w-10 h-14 rounded flex-shrink-0 bg-divider" />
                       </>
                     ) : (
-                      <div className="w-10 h-14 rounded flex-shrink-0 bg-gray-200" />
+                      <div className="w-10 h-14 rounded flex-shrink-0 bg-divider" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{result.title}</p>
-                      <p className="text-xs text-gray-600 truncate">{result.author}</p>
+                      <p className="text-sm font-medium text-ink truncate">{result.title}</p>
+                      <p className="text-xs text-muted truncate">{result.author}</p>
                     </div>
                   </button>
                 </li>
@@ -394,7 +394,7 @@ export function BookForm({ bookId, initial }: BookFormProps) {
           {rating != null && (
             <button
               type="button"
-              className="ml-2 text-xs text-gray-500 hover:text-gray-700"
+              className="ml-2 text-xs text-muted hover:text-ink"
               onClick={() => setRating(null)}
             >
               Clear

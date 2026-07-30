@@ -16,9 +16,9 @@ interface Book {
 }
 
 const STATUS_STYLES = {
-  reading: "bg-blue-100 text-blue-800",
-  completed: "bg-green-100 text-green-800",
-  want_to_read: "bg-yellow-100 text-yellow-800",
+  reading: "bg-status-reading text-status-reading-text",
+  completed: "bg-status-completed text-status-completed-text",
+  want_to_read: "bg-status-want text-status-want-text",
 };
 
 const STATUS_LABELS = {
@@ -49,18 +49,18 @@ export function AdminBookRow({ book }: { book: Book }) {
   }
 
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50">
-      <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{book.title}</td>
-      <td className="px-4 py-3 text-gray-700">{book.author}</td>
+    <tr className="border-b border-divider hover:bg-cream">
+      <td className="px-4 py-3 font-medium text-ink max-w-xs truncate">{book.title}</td>
+      <td className="px-4 py-3 text-ink">{book.author}</td>
       <td className="px-4 py-3">
-        <span className="badge bg-gray-100 text-gray-700">{book.genre}</span>
+        <span className="badge bg-cream text-muted">{book.genre}</span>
       </td>
       <td className="px-4 py-3">
         <span className={`badge ${STATUS_STYLES[book.readingStatus]}`}>
           {STATUS_LABELS[book.readingStatus]}
         </span>
       </td>
-      <td className="px-4 py-3 text-gray-700">${book.price.toFixed(2)}</td>
+      <td className="px-4 py-3 text-ink">${book.price.toFixed(2)}</td>
       <td className="px-4 py-3 text-yellow-500">
         {book.rating != null ? (
           <span aria-label={`Rated ${book.rating} out of 5`}>
@@ -68,12 +68,12 @@ export function AdminBookRow({ book }: { book: Book }) {
             {"☆".repeat(5 - book.rating)}
           </span>
         ) : (
-          <span className="text-gray-300">—</span>
+          <span className="text-divider">—</span>
         )}
       </td>
-      <td className="px-4 py-3 text-gray-600 text-xs">
+      <td className="px-4 py-3 text-muted text-xs">
         {book.owner.name}<br />
-        <span className="text-gray-400">{book.owner.email}</span>
+        <span className="text-muted">{book.owner.email}</span>
       </td>
       <td className="px-4 py-3 text-right">
         <div className="flex justify-end gap-2">

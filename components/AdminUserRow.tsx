@@ -56,16 +56,16 @@ export function AdminUserRow({ user, currentUserId }: { user: User; currentUserI
   }
 
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50">
-      <td className="px-4 py-3 font-medium text-gray-900">{user.name}</td>
-      <td className="px-4 py-3 text-gray-700 text-xs">{user.email}</td>
+    <tr className="border-b border-divider hover:bg-cream">
+      <td className="px-4 py-3 font-medium text-ink">{user.name}</td>
+      <td className="px-4 py-3 text-muted text-xs">{user.email}</td>
       <td className="px-4 py-3">
-        <span className={`badge ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-700"}`}>
+        <span className={`badge ${user.role === "admin" ? "bg-status-completed text-status-completed-text" : "bg-cream text-muted"}`}>
           {user.role}
         </span>
       </td>
-      <td className="px-4 py-3 text-gray-700">{user._count.books}</td>
-      <td className="px-4 py-3 text-gray-500 text-xs">
+      <td className="px-4 py-3 text-ink">{user._count.books}</td>
+      <td className="px-4 py-3 text-muted text-xs">
         {new Date(user.createdAt).toLocaleDateString()}
       </td>
       <td className="px-4 py-3 text-right">
@@ -88,7 +88,7 @@ export function AdminUserRow({ user, currentUserId }: { user: User; currentUserI
           </div>
         )}
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-        {isSelf && <span className="text-xs text-gray-400">You</span>}
+        {isSelf && <span className="text-xs text-muted">You</span>}
       </td>
     </tr>
   );
